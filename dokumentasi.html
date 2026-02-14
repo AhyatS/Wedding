@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUA & Attire</title>
+    <title>Dokumentasi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
@@ -25,15 +25,15 @@
     <nav class="nav flex-column">
         <a class="nav-link" href="index.html"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
         <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
-        <a class="nav-link active" href="mua.html"><i class="bi bi-magic me-2"></i> MUA & Attire</a>
-        <a class="nav-link" href="dokumentasi.html"><i class="bi bi-camera-reels me-2"></i> Dokumentasi</a>
+        <a class="nav-link" href="mua.html"><i class="bi bi-magic me-2"></i> MUA & Attire</a>
+        <a class="nav-link active" href="dokumentasi.html"><i class="bi bi-camera-reels me-2"></i> Dokumentasi</a>
         <a class="nav-link" href="vendors.html"><i class="bi bi-search me-2"></i> Survei Vendor</a>
     </nav>
 </div>
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">💄 MUA & Attire</h2>
+        <h2 class="fw-bold">📸 Dokumentasi</h2>
         <button class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 12px;" data-bs-toggle="modal" data-bs-target="#modalAdd">+ Tambah Data</button>
     </div>
 
@@ -59,10 +59,10 @@
 <div class="modal fade" id="modalAdd" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-2" style="border-radius:20px;">
-            <div class="modal-header border-0"><h5 class="fw-bold">Input MUA/Baju</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header border-0"><h5 class="fw-bold">Input Dokumentasi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <input type="text" id="f-item" class="form-control mb-2" placeholder="Nama Item (Cth: Gaun)">
+                    <input type="text" id="f-item" class="form-control mb-2" placeholder="Nama Item (Cth: Fotografer)">
                     <input type="text" id="f-vendor" class="form-control mb-2" placeholder="Nama Vendor">
                     <input type="number" id="f-price" class="form-control" placeholder="Total Estimasi Harga (Rp)">
                 </div>
@@ -100,7 +100,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const KATEGORI_DB = "mua_attire";
+    const KATEGORI_DB = "dokumentasi";
 
     document.getElementById('btn-save').onclick = () => {
         const item = document.getElementById('f-item').value;
