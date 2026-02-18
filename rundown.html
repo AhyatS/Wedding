@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rundown Acara - Wedding Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --sidebar-width: 260px; --accent: #ff75a0; --bg: #fdf6f8; }
+        body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; margin: 0; }
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; }
+        .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; }
+        .nav-link { color: #666; padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; text-decoration: none; }
+        .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; }
+        .card-table { border: none; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); background: white; padding: 20px; }
+        
+        /* Time Line Style */
+        .time-col { font-family: 'Consolas', monospace; font-weight: bold; color: var(--accent); }
+        .pic-badge { background: #e2e6ea; color: #495057; font-size: 0.8rem; padding: 4px 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="text-center mb-5"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
+    <nav class="nav flex-column">
+        <a class="nav-link" href="index.html"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
+        <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
+        <a class="nav-link" href="mua.html"><i class="bi bi-magic me-2"></i> MUA & Attire</a>
+        <a class="nav-link" href="dokumentasi.html"><i class="bi bi-camera-reels me-2"></i> Dokumentasi</a>
+        <a class="nav-link" href="logistik.html"><i class="bi bi-box-seam-fill me-2"></i> Logistik & KUA</a>
+        <a class="nav-link" href="tamu.html"><i class="bi bi-people-fill me-2"></i> Daftar Tamu</a>
+        <a class="nav-link active" href="rundown.html"><i class="bi bi-clock-history me-2"></i> Rundown Acara</a>
+        <a class="nav-link" href="vendors.html"><i class="bi bi-search me-2"></i> Survei Vendor</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">⏳ Rundown Acara Hari-H</h2>
+            <p class="text-muted small">Susunan acara, waktu, dan penanggung jawab (PIC).</p>
+        </div>
+        <button class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 12px;" data-bs-toggle="modal" data-bs-target="#modalAdd">+ Tambah Kegiatan</button>
+    </div>
+
+    <div class="card card-table">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width: 15%">Waktu</th>
+                        <th style="width: 35%">Kegiatan / Acara</th>
+                        <th style="width: 20%">PIC (Penanggung Jawab)</th>
+                        <th style="width: 20%">Keterangan</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="data-list"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAdd" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-2" style="border-radius:20px;">
+            <div class="modal-header border-0"><h5 class="fw-bold">Input Kegiatan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">Jam Mulai</label>
+                        <input type="time" id="f-start" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">Jam Selesai</label>
+                        <input type="time" id="f-end" class="form-control">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <input type="text" id="f-activity" class="form-control mb-2" placeholder="Nama Kegiatan (Cth: Akad Nikah)">
+                    <input type="text" id="f-pic" class="form-control mb-2" placeholder="PIC (Cth: WO / Om Budi)">
+                    <input type="text" id="f-note" class="form-control" placeholder="Keterangan Tambahan">
+                </div>
+                <button id="btn-save" class="btn btn-primary w-100 fw-bold mt-2" style="border-radius:12px;">Simpan Jadwal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I",
+        authDomain: "wedding-budget-ahyat.firebaseapp.com",
+        databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "wedding-budget-ahyat",
+        storageBucket: "wedding-budget-ahyat.firebasestorage.app",
+        messagingSenderId: "225604233645",
+        appId: "1:225604233645:web:9526c2ca39e5b5165f5924"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const DB_RUNDOWN = "rundown_acara";
+
+    document.getElementById('btn-save').onclick = () => {
+        const start = document.getElementById('f-start').value;
+        const end = document.getElementById('f-end').value;
+        const activity = document.getElementById('f-activity').value;
+        const pic = document.getElementById('f-pic').value;
+        const note = document.getElementById('f-note').value;
+        
+        if(start && activity) {
+            push(ref(db, DB_RUNDOWN), { start, end, activity, pic, note }).then(() => location.reload());
+        } else {
+            alert('Jam Mulai dan Nama Kegiatan wajib diisi!');
+        }
+    };
+
+    onValue(ref(db, DB_RUNDOWN), (s) => {
+        const d = s.val();
+        let items = [];
+        // Convert object ke array biar bisa disortir berdasarkan jam
+        for(let id in d) {
+            items.push({ id, ...d[id] });
+        }
+        
+        // Sortir jam (Pagi ke Malam)
+        items.sort((a, b) => a.start.localeCompare(b.start));
+
+        let h = '';
+        items.forEach(item => {
+            h += `<tr>
+                <td class="time-col">${item.start} - ${item.end || '...'}</td>
+                <td class="fw-bold">${item.activity}</td>
+                <td><span class="pic-badge">${item.pic || '-'}</span></td>
+                <td class="text-muted small">${item.note || '-'}</td>
+                <td class="text-center"><button onclick="del('${item.id}')" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button></td>
+            </tr>`;
+        });
+        document.getElementById('data-list').innerHTML = h || '<tr><td colspan="5" class="text-center p-4 text-muted">Belum ada jadwal acara.</td></tr>';
+    });
+
+    window.del = (id) => { if(confirm('Hapus jadwal ini?')) remove(ref(db, DB_RUNDOWN + '/' + id)); };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
