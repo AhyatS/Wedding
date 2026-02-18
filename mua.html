@@ -9,29 +9,19 @@
     <style>
         :root { --sidebar-width: 260px; --accent: #ff75a0; --bg: #fdf6f8; }
         body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; margin: 0; }
-        
-        /* Sidebar & Layout */
         .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; z-index: 1001; transition: 0.3s; }
         .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; transition: 0.3s; }
-        
-        /* Mobile Nav */
-        .mobile-nav { display: none; } 
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        
+        .mobile-nav { display: none; } .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         @media (max-width: 768px) {
-            .sidebar { left: -100%; } 
-            .sidebar.active { left: 0; }
+            .sidebar { left: -100%; } .sidebar.active { left: 0; }
             .main-content { margin-left: 0; padding: 20px; padding-top: 80px; }
             .mobile-nav { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 999; padding: 0 20px; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
             .overlay.active { display: block; }
         }
-
-        /* Styling */
         .nav-link { color: #666; padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; }
         .card-table { border: none; border-radius: 20px; background: white; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
-        .badge-cowo { background: #e7f1ff; color: #0d6efd; font-size: 0.8rem; } 
-        .badge-cewe { background: #ffeef0; color: #d63384; font-size: 0.8rem; }
+        .badge-cowo { background: #e7f1ff; color: #0d6efd; font-size: 0.8rem; } .badge-cewe { background: #ffeef0; color: #d63384; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -61,144 +51,62 @@
         <h2 class="fw-bold">💄 MUA & Attire</h2>
         <button class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 12px;" onclick="bukaModal()">+ Tambah</button>
     </div>
-    
     <div class="card card-table">
         <div class="table-responsive">
             <table class="table align-middle" style="min-width: 600px;">
-                <thead class="bg-light">
-                    <tr>
-                        <th>Item</th>
-                        <th>Vendor</th>
-                        <th>Harga</th>
-                        <th>Rincian Bayar</th>
-                        <th>Sisa</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="data-list">
-                    </tbody>
+                <thead class="bg-light"><tr><th>Item</th><th>Vendor</th><th>Harga</th><th>Bayar</th><th>Sisa</th><th class="text-center">Aksi</th></tr></thead>
+                <tbody id="data-list"></tbody>
             </table>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalForm" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-3" style="border-radius:20px;">
-            <h5 class="fw-bold mb-3" id="modalTitle">Input Data</h5>
-            <input type="text" id="f-item" class="form-control mb-2" placeholder="Nama Item">
-            <input type="text" id="f-vendor" class="form-control mb-2" placeholder="Nama Vendor">
-            <input type="number" id="f-price" class="form-control mb-3" placeholder="Total Harga">
-            <div class="d-flex gap-2 mb-3">
-                <input type="number" id="f-cowo" class="form-control" placeholder="Bayar Cowo">
-                <input type="number" id="f-cewe" class="form-control" placeholder="Bayar Cewe">
-            </div>
-            <button id="btn-save" class="btn btn-primary w-100 fw-bold rounded-3">Simpan Data</button>
-        </div>
+<div class="modal fade" id="modalForm" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-3" style="border-radius:20px;">
+    <h5 class="fw-bold mb-3" id="modalTitle">Input Data</h5>
+    <input type="text" id="f-item" class="form-control mb-2" placeholder="Nama Item">
+    <input type="text" id="f-vendor" class="form-control mb-2" placeholder="Nama Vendor">
+    <input type="number" id="f-price" class="form-control mb-3" placeholder="Total Harga">
+    <div class="d-flex gap-2 mb-3">
+        <input type="number" id="f-cowo" class="form-control" placeholder="Bayar Cowo">
+        <input type="number" id="f-cewe" class="form-control" placeholder="Bayar Cewe">
     </div>
-</div>
+    <button id="btn-save" class="btn btn-primary w-100 fw-bold rounded-3">Simpan Data</button>
+</div></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    const app = initializeApp({ apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I", authDomain: "wedding-budget-ahyat.firebaseapp.com", databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wedding-budget-ahyat", storageBucket: "wedding-budget-ahyat.firebasestorage.app", messagingSenderId: "225604233645", appId: "1:225604233645:web:9526c2ca39e5b5165f5924" });
+    const db = getDatabase(app); const KATEGORI = "mua_attire";
+    let curId=null, modal;
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I",
-        authDomain: "wedding-budget-ahyat.firebaseapp.com",
-        databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "wedding-budget-ahyat",
-        storageBucket: "wedding-budget-ahyat.firebasestorage.app",
-        messagingSenderId: "225604233645",
-        appId: "1:225604233645:web:9526c2ca39e5b5165f5924"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const KATEGORI = "mua_attire";
-    let curId = null;
-    let modal;
-
-    window.onload = () => {
-        modal = new bootstrap.Modal(document.getElementById('modalForm'));
-    };
-
-    window.toggleSidebar = () => {
-        document.querySelector('.sidebar').classList.toggle('active');
-        document.querySelector('.overlay').classList.toggle('active');
-    };
-
-    window.bukaModal = () => {
-        curId = null;
-        document.getElementById('modalTitle').innerText = "Tambah Data";
-        resetForm();
+    window.onload=()=>{modal=new bootstrap.Modal(document.getElementById('modalForm'));}
+    window.toggleSidebar=()=>{document.querySelector('.sidebar').classList.toggle('active');document.querySelector('.overlay').classList.toggle('active');}
+    window.bukaModal=()=>{curId=null; document.getElementById('modalTitle').innerText="Tambah Data"; resetForm(); modal.show();}
+    window.edit=(id)=>{
+        curId=id; const d=window.allData[id];
+        document.getElementById('modalTitle').innerText="Edit Data";
+        document.getElementById('f-item').value=d.item; document.getElementById('f-vendor').value=d.vendor; document.getElementById('f-price').value=d.price; document.getElementById('f-cowo').value=d.paidCowo; document.getElementById('f-cewe').value=d.paidCewe;
         modal.show();
-    };
-
-    window.edit = (id) => {
-        curId = id;
-        const d = window.allData[id];
-        document.getElementById('modalTitle').innerText = "Edit Data";
-        document.getElementById('f-item').value = d.item;
-        document.getElementById('f-vendor').value = d.vendor;
-        document.getElementById('f-price').value = d.price;
-        document.getElementById('f-cowo').value = d.paidCowo;
-        document.getElementById('f-cewe').value = d.paidCewe;
-        modal.show();
-    };
-
-    function resetForm() {
-        document.querySelectorAll('input').forEach(i => i.value = '');
     }
-
-    document.getElementById('btn-save').onclick = () => {
-        const data = {
-            item: document.getElementById('f-item').value,
-            vendor: document.getElementById('f-vendor').value,
-            price: +document.getElementById('f-price').value,
-            paidCowo: +document.getElementById('f-cowo').value,
-            paidCewe: +document.getElementById('f-cewe').value
-        };
-
-        if (data.item) {
-            if (curId) {
-                update(ref(db, KATEGORI + '/' + curId), data).then(() => modal.hide());
-            } else {
-                push(ref(db, KATEGORI), data).then(() => modal.hide());
-            }
+    function resetForm(){document.querySelectorAll('input').forEach(i=>i.value='');}
+    document.getElementById('btn-save').onclick=()=>{
+        const data={item:document.getElementById('f-item').value, vendor:document.getElementById('f-vendor').value, price:+document.getElementById('f-price').value, paidCowo:+document.getElementById('f-cowo').value, paidCewe:+document.getElementById('f-cewe').value};
+        if(data.item){ (curId ? update(ref(db,KATEGORI+'/'+curId),data) : push(ref(db,KATEGORI),data)).then(()=>{modal.hide();}); }
+    }
+    // FUNGSI GLOBAL HAPUS
+    window.hapusData = (id) => {
+        if(confirm('Hapus data ini selamanya?')) { remove(ref(db, KATEGORI + '/' + id)); }
+    }
+    onValue(ref(db,KATEGORI),(s)=>{
+        const d=s.val(); window.allData=d||{}; let h='';
+        for(let id in d){
+            const c=d[id].paidCowo||0, w=d[id].paidCewe||0, sisa=d[id].price-(c+w);
+            h+=`<tr><td class="fw-bold">${d[id].item}</td><td>${d[id].vendor}</td><td>${fmt(d[id].price)}</td><td><div class="d-flex flex-column gap-1"><span class="badge badge-cowo text-start">♂ ${fmt(c)}</span><span class="badge badge-cewe text-start">♀ ${fmt(w)}</span></div></td><td class="${sisa>0?'text-danger':'text-success'} fw-bold">${fmt(sisa)}</td><td class="text-center"><button onclick="edit('${id}')" class="btn btn-sm btn-outline-warning border-0"><i class="bi bi-pencil-square"></i></button><button onclick="hapusData('${id}')" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button></td></tr>`;
         }
-    };
-
-    onValue(ref(db, KATEGORI), (s) => {
-        const d = s.val();
-        window.allData = d || {};
-        let h = '';
-        for (let id in d) {
-            const c = d[id].paidCowo || 0;
-            const w = d[id].paidCewe || 0;
-            const sisa = d[id].price - (c + w);
-            h += `<tr>
-                <td class="fw-bold">${d[id].item}</td>
-                <td>${d[id].vendor}</td>
-                <td>${fmt(d[id].price)}</td>
-                <td>
-                    <div class="d-flex flex-column gap-1">
-                        <span class="badge badge-cowo text-start">♂ ${fmt(c)}</span>
-                        <span class="badge badge-cewe text-start">♀ ${fmt(w)}</span>
-                    </div>
-                </td>
-                <td class="${sisa > 0 ? 'text-danger' : 'text-success'} fw-bold">${fmt(sisa)}</td>
-                <td class="text-center">
-                    <button onclick="edit('${id}')" class="btn btn-sm btn-outline-warning border-0"><i class="bi bi-pencil-square"></i></button>
-                    <button onclick="if(confirm('Hapus?')) remove(ref(db,'${KATEGORI}/${id}'))" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button>
-                </td>
-            </tr>`;
-        }
-        document.getElementById('data-list').innerHTML = h;
+        document.getElementById('data-list').innerHTML=h;
     });
-
-    function fmt(n) {
-        return 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
-    }
+    function fmt(n){return 'Rp '+new Intl.NumberFormat('id-ID').format(n);}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
