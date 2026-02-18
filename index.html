@@ -9,78 +9,27 @@
     <style>
         :root { --sidebar-width: 260px; --accent: #ff75a0; --bg: #fdf6f8; }
         body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; margin: 0; }
-        
-        /* Sidebar Styling */
         .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; z-index: 1000; overflow-y: auto; }
         .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; }
-        
         .nav-link { color: #666; padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; text-decoration: none; font-weight: 500; }
         .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; box-shadow: 0 4px 12px rgba(255, 117, 160, 0.3); }
-        
-        /* Header Cards */
         .stat-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); background: white; padding: 20px; height: 100%; transition: 0.3s; }
         .stat-card:hover { transform: translateY(-3px); }
 
-        /* SPREADSHEET TABLE STYLE (Mirip Gambar) */
-        .spreadsheet-container {
-            background: #1a1a1a; /* Background Gelap */
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            color: #eee;
-        }
-        
-        .table-dark-custom {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Consolas', 'Monaco', monospace; /* Font ala coding/excel */
-            font-size: 0.9rem;
-        }
-
-        .table-dark-custom thead tr {
-            background-color: #333;
-            border-bottom: 2px solid #555;
-        }
-
-        .table-dark-custom th {
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-right: 1px solid #444;
-        }
-
-        .table-dark-custom td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #333;
-            border-right: 1px solid #333;
-            vertical-align: middle;
-        }
-
-        .table-dark-custom tbody tr:hover {
-            background-color: #252525;
-        }
-
-        /* Group Header */
-        .group-header {
-            background-color: #444;
-            color: #fff;
-            font-weight: bold;
-            padding: 8px 15px;
-            text-transform: uppercase;
-        }
-
-        /* Status Badges */
+        /* SPREADSHEET STYLE */
+        .spreadsheet-container { background: #1a1a1a; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: #eee; }
+        .table-dark-custom { width: 100%; border-collapse: collapse; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; }
+        .table-dark-custom thead tr { background-color: #333; border-bottom: 2px solid #555; }
+        .table-dark-custom th { padding: 12px 15px; text-align: left; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 1px; border-right: 1px solid #444; }
+        .table-dark-custom td { padding: 10px 15px; border-bottom: 1px solid #333; border-right: 1px solid #333; vertical-align: middle; }
+        .table-dark-custom tbody tr:hover { background-color: #252525; }
+        .group-header { background-color: #444; color: #fff; font-weight: bold; padding: 8px 15px; text-transform: uppercase; }
         .badge-status { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; }
         .status-lunas { background: #198754; color: white; }
         .status-belum { background: #ffc107; color: #000; }
-        
-        /* Money Columns */
         .col-money { text-align: right; font-family: 'Consolas', monospace; }
-        .text-him { color: #54a0ff; } /* Biru Muda */
-        .text-her { color: #ff9ff3; } /* Pink Muda */
+        .text-him { color: #54a0ff; }
+        .text-her { color: #ff9ff3; }
     </style>
 </head>
 <body>
@@ -92,8 +41,9 @@
         <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
         <a class="nav-link" href="mua.html"><i class="bi bi-magic me-2"></i> MUA & Attire</a>
         <a class="nav-link" href="dokumentasi.html"><i class="bi bi-camera-reels me-2"></i> Dokumentasi</a>
-        <a class="nav-link" href="vendors.html"><i class="bi bi-search me-2"></i> Survei Vendor</a>
+        <a class="nav-link" href="logistik.html"><i class="bi bi-box-seam-fill me-2"></i> Logistik & KUA</a>
         <a class="nav-link" href="tamu.html"><i class="bi bi-people-fill me-2"></i> Daftar Tamu</a>
+        <a class="nav-link" href="vendors.html"><i class="bi bi-search me-2"></i> Survei Vendor</a>
     </nav>
 </div>
 
@@ -104,30 +54,10 @@
     </div>
     
     <div class="row g-3 mb-5">
-        <div class="col-md-3">
-            <div class="stat-card border-start border-4 border-primary">
-                <small class="text-muted fw-bold">TOTAL PLAN</small>
-                <h4 id="grand-total" class="fw-bold mt-1">Rp 0</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card border-start border-4 border-info">
-                <small class="text-info fw-bold"><i class="bi bi-gender-male"></i> TOTAL HIM</small>
-                <h4 id="total-cowo" class="fw-bold mt-1 text-dark">Rp 0</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card border-start border-4 border-danger">
-                <small class="text-danger fw-bold"><i class="bi bi-gender-female"></i> TOTAL HER</small>
-                <h4 id="total-cewe" class="fw-bold mt-1 text-dark">Rp 0</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card border-start border-4 border-warning">
-                <small class="text-warning fw-bold">GAP / SISA</small>
-                <h4 id="grand-debt" class="fw-bold mt-1 text-dark">Rp 0</h4>
-            </div>
-        </div>
+        <div class="col-md-3"><div class="stat-card border-start border-4 border-primary"><small class="text-muted fw-bold">TOTAL PLAN</small><h4 id="grand-total" class="fw-bold mt-1">Rp 0</h4></div></div>
+        <div class="col-md-3"><div class="stat-card border-start border-4 border-info"><small class="text-info fw-bold"><i class="bi bi-gender-male"></i> TOTAL HIM</small><h4 id="total-cowo" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
+        <div class="col-md-3"><div class="stat-card border-start border-4 border-danger"><small class="text-danger fw-bold"><i class="bi bi-gender-female"></i> TOTAL HER</small><h4 id="total-cewe" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
+        <div class="col-md-3"><div class="stat-card border-start border-4 border-warning"><small class="text-warning fw-bold">GAP / SISA</small><h4 id="grand-debt" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
     </div>
 
     <div class="spreadsheet-container">
@@ -171,11 +101,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     
-    // Urutan Kategori
+    // Kategori Lengkap
     const categories = [
         { key: 'venue_catering', label: 'VENUE & CATERING' },
         { key: 'mua_attire', label: 'MUA & ATTIRE' },
-        { key: 'dokumentasi', label: 'DOKUMENTASI' }
+        { key: 'dokumentasi', label: 'DOKUMENTASI' },
+        { key: 'logistik_lainnya', label: 'LOGISTIK & LAINNYA' } // Kategori Baru
     ];
 
     function loadAllData() {
@@ -187,7 +118,6 @@
             onValue(ref(db, cat.key), (snapshot) => {
                 const data = snapshot.val();
                 let items = [];
-                
                 if (data) {
                     for (let id in data) {
                         const item = data[id];
@@ -197,7 +127,6 @@
                         stats.cewe += (item.paidCewe || 0);
                     }
                 }
-                
                 allData[cat.label] = items;
                 loadedCount++;
 
@@ -222,46 +151,26 @@
 
         categories.forEach(cat => {
             const items = groupedData[cat.label] || [];
-            
-            // Header Kategori
             html += `<tr class="group-header"><td colspan="6">${cat.label}</td></tr>`;
-
-            if(items.length === 0) {
-                 html += `<tr><td colspan="6" class="text-center text-muted fst-italic py-3">Belum ada data</td></tr>`;
-            }
+            if(items.length === 0) { html += `<tr><td colspan="6" class="text-center text-muted fst-italic py-3">Belum ada data</td></tr>`; }
 
             items.forEach(item => {
                 const paidCowo = item.paidCowo || 0;
                 const paidCewe = item.paidCewe || 0;
                 const totalPaid = paidCowo + paidCewe;
                 const sisa = (item.price || 0) - totalPaid;
-                
-                // Logic Status
-                let statusBadge = '';
-                if (sisa <= 0) {
-                    statusBadge = '<span class="badge-status status-lunas">LUNAS</span>';
-                } else {
-                    statusBadge = '<span class="badge-status status-belum">BELUM</span>';
-                }
+                const statusBadge = sisa <= 0 ? '<span class="badge-status status-lunas">LUNAS</span>' : '<span class="badge-status status-belum">BELUM</span>';
 
-                html += `
-                    <tr>
-                        <td>
-                            <div class="fw-bold text-white">${item.item}</div>
-                            <small class="text-muted" style="font-size:0.75rem">${item.vendor || '-'}</small>
-                        </td>
-                        <td>${statusBadge}</td>
-                        <td class="col-money">${formatRupiah(item.price || 0, false)}</td>
-                        <td class="col-money text-him">${paidCowo > 0 ? formatRupiah(paidCowo, false) : '-'}</td>
-                        <td class="col-money text-her">${paidCewe > 0 ? formatRupiah(paidCewe, false) : '-'}</td>
-                        <td class="col-money ${sisa > 0 ? 'text-warning' : 'text-success'}">
-                            ${sisa > 0 ? formatRupiah(sisa, false) : '0'}
-                        </td>
-                    </tr>
-                `;
+                html += `<tr>
+                    <td><div class="fw-bold text-white">${item.item}</div><small class="text-muted" style="font-size:0.75rem">${item.vendor || '-'}</small></td>
+                    <td>${statusBadge}</td>
+                    <td class="col-money">${formatRupiah(item.price || 0, false)}</td>
+                    <td class="col-money text-him">${paidCowo > 0 ? formatRupiah(paidCowo, false) : '-'}</td>
+                    <td class="col-money text-her">${paidCewe > 0 ? formatRupiah(paidCewe, false) : '-'}</td>
+                    <td class="col-money ${sisa > 0 ? 'text-warning' : 'text-success'}">${sisa > 0 ? formatRupiah(sisa, false) : '0'}</td>
+                </tr>`;
             });
         });
-
         tbody.innerHTML = html;
     }
 
@@ -269,7 +178,6 @@
         let str = new Intl.NumberFormat('id-ID').format(angka);
         return withSymbol ? 'Rp ' + str : str;
     }
-
     loadAllData();
 </script>
 </body>
