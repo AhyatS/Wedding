@@ -15,8 +15,6 @@
         .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; box-shadow: 0 4px 12px rgba(255, 117, 160, 0.3); }
         .stat-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); background: white; padding: 20px; height: 100%; transition: 0.3s; }
         .stat-card:hover { transform: translateY(-3px); }
-
-        /* SPREADSHEET STYLE */
         .spreadsheet-container { background: #1a1a1a; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: #eee; }
         .table-dark-custom { width: 100%; border-collapse: collapse; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; }
         .table-dark-custom thead tr { background-color: #333; border-bottom: 2px solid #555; }
@@ -30,6 +28,11 @@
         .col-money { text-align: right; font-family: 'Consolas', monospace; }
         .text-him { color: #54a0ff; }
         .text-her { color: #ff9ff3; }
+        @media print {
+            .sidebar, .btn, .nav-link, .modal { display: none !important; }
+            .main-content { margin-left: 0 !important; padding: 0 !important; width: 100% !important; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
@@ -37,23 +40,33 @@
 <div class="sidebar">
     <div class="text-center mb-5"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
     <nav class="nav flex-column">
-    <a class="nav-link" href="index.html"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
-    <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
-    <a class="nav-link" href="mua.html"><i class="bi bi-magic me-2"></i> MUA & Attire</a>
-    <a class="nav-link" href="dokumentasi.html"><i class="bi bi-camera-reels me-2"></i> Dokumentasi</a>
-    <a class="nav-link" href="logistik.html"><i class="bi bi-box-seam-fill me-2"></i> Logistik & KUA</a>
-    <a class="nav-link" href="tamu.html"><i class="bi bi-people-fill me-2"></i> Daftar Tamu</a>
-    <a class="nav-link" href="vendors.html"><i class="bi bi-search me-2"></i> Survei Vendor</a>
-    <a class="nav-link active" href="rundown.html"><i class="bi bi-clock-history me-2"></i> Rundown Acara</a>
-</nav>
+        <a class="nav-link active" href="index.html"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
+        <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
+        <a class="nav-link" href="mua.html"><i class="bi bi-magic me-2"></i> MUA & Attire</a>
+        <a class="nav-link" href="dokumentasi.html"><i class="bi bi-camera-reels me-2"></i> Dokumentasi</a>
+        <a class="nav-link" href="logistik.html"><i class="bi bi-box-seam-fill me-2"></i> Logistik & KUA</a>
+        <a class="nav-link" href="tamu.html"><i class="bi bi-people-fill me-2"></i> Daftar Tamu</a>
+        <a class="nav-link" href="rundown.html"><i class="bi bi-clock-history me-2"></i> Rundown Acara</a>
+        <a class="nav-link" href="vendors.html"><i class="bi bi-search me-2"></i> Survei Vendor</a>
+    </nav>
 </div>
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-dark">Wedding Budget Tracker</h2>
-        <span class="badge bg-dark p-2 px-3 rounded-pill">Spreadsheet View</span>
+        <button onclick="window.print()" class="btn btn-dark btn-sm rounded-pill px-3"><i class="bi bi-printer-fill me-1"></i> Simpan PDF</button>
     </div>
     
+    <div class="alert alert-light border-0 shadow-sm d-flex align-items-center mb-4" role="alert" style="border-radius: 15px;">
+        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+            <i class="bi bi-calendar-heart-fill fs-4"></i>
+        </div>
+        <div>
+            <small class="text-muted fw-bold text-uppercase">Menuju Hari Bahagia</small>
+            <h4 class="mb-0 fw-bold text-primary" id="countdown-text">Loading...</h4>
+        </div>
+    </div>
+
     <div class="row g-3 mb-5">
         <div class="col-md-3"><div class="stat-card border-start border-4 border-primary"><small class="text-muted fw-bold">TOTAL PLAN</small><h4 id="grand-total" class="fw-bold mt-1">Rp 0</h4></div></div>
         <div class="col-md-3"><div class="stat-card border-start border-4 border-info"><small class="text-info fw-bold"><i class="bi bi-gender-male"></i> TOTAL HIM</small><h4 id="total-cowo" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
@@ -102,12 +115,20 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     
-    // Kategori Lengkap
+    // GANTI TANGGAL NIKAH DI SINI
+    const weddingDate = new Date("2026-12-31").getTime(); 
+    setInterval(function() {
+        const now = new Date().getTime();
+        const distance = weddingDate - now;
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        document.getElementById("countdown-text").innerHTML = days + " Hari Lagi! 💍";
+    }, 1000);
+
     const categories = [
         { key: 'venue_catering', label: 'VENUE & CATERING' },
         { key: 'mua_attire', label: 'MUA & ATTIRE' },
         { key: 'dokumentasi', label: 'DOKUMENTASI' },
-        { key: 'logistik_lainnya', label: 'LOGISTIK & LAINNYA' } // Kategori Baru
+        { key: 'logistik_lainnya', label: 'LOGISTIK & LAINNYA' }
     ];
 
     function loadAllData() {
