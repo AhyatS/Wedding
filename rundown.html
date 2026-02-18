@@ -9,18 +9,31 @@
     <style>
         :root { --sidebar-width: 260px; --accent: #ff75a0; --bg: #fdf6f8; }
         body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; margin: 0; }
-        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; }
-        .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; }
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; z-index: 1001; transition: 0.3s; }
+        .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; transition: 0.3s; }
+        .mobile-nav { display: none; } .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        @media (max-width: 768px) {
+            .sidebar { left: -100%; } .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 80px; }
+            .mobile-nav { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 999; padding: 0 20px; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+            .overlay.active { display: block; }
+        }
         .nav-link { color: #666; padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; }
-        .card-table { border: none; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); background: white; padding: 20px; }
+        .card-table { border: none; border-radius: 20px; background: white; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
         .time-col { font-family: 'Consolas', monospace; font-weight: bold; color: var(--accent); }
     </style>
 </head>
 <body>
 
+<div class="mobile-nav">
+    <h5 class="fw-bold m-0" style="color: var(--accent);">Wedding</h5>
+    <button class="btn btn-light" onclick="document.querySelector('.sidebar').classList.toggle('active');document.querySelector('.overlay').classList.toggle('active');"><i class="bi bi-list fs-4"></i></button>
+</div>
+<div class="overlay" onclick="document.querySelector('.sidebar').classList.remove('active');this.classList.remove('active');"></div>
+
 <div class="sidebar">
-    <div class="text-center mb-5"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
+    <div class="text-center mb-5 d-none d-md-block"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
     <nav class="nav flex-column">
         <a class="nav-link" href="index.html"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
         <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
@@ -36,78 +49,49 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">⏳ Rundown Acara</h2>
-        <button class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 12px;" onclick="bukaModalTambah()">+ Tambah Kegiatan</button>
+        <button class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 12px;" onclick="bukaModal()">+ Kegiatan</button>
     </div>
     <div class="card card-table">
         <div class="table-responsive">
-            <table class="table align-middle table-hover">
-                <thead class="bg-light"><tr><th style="width: 15%">Waktu</th><th style="width: 35%">Kegiatan</th><th style="width: 20%">PIC</th><th style="width: 20%">Ket</th><th class="text-center">Aksi</th></tr></thead>
+            <table class="table align-middle" style="min-width: 600px;">
+                <thead class="bg-light"><tr><th>Waktu</th><th>Kegiatan</th><th>PIC</th><th>Ket</th><th class="text-center">Aksi</th></tr></thead>
                 <tbody id="data-list"></tbody>
             </table>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalForm" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-2" style="border-radius:20px;">
-            <div class="modal-header border-0"><h5 class="fw-bold" id="modalTitle">Input Kegiatan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="row g-2 mb-3">
-                    <div class="col-6"><label class="small text-muted fw-bold">Jam Mulai</label><input type="time" id="f-start" class="form-control"></div>
-                    <div class="col-6"><label class="small text-muted fw-bold">Jam Selesai</label><input type="time" id="f-end" class="form-control"></div>
-                </div>
-                <input type="text" id="f-activity" class="form-control mb-2" placeholder="Nama Kegiatan">
-                <input type="text" id="f-pic" class="form-control mb-2" placeholder="PIC">
-                <input type="text" id="f-note" class="form-control" placeholder="Keterangan">
-                <button id="btn-save" class="btn btn-primary w-100 fw-bold mt-2" style="border-radius:12px;">Simpan</button>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="modal fade" id="modalForm" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-3" style="border-radius:20px;">
+    <h5 class="fw-bold mb-3" id="modalTitle">Kegiatan</h5>
+    <div class="row g-2 mb-2"><div class="col-6"><input type="time" id="f-start" class="form-control"></div><div class="col-6"><input type="time" id="f-end" class="form-control"></div></div>
+    <input type="text" id="f-act" class="form-control mb-2" placeholder="Nama Kegiatan">
+    <input type="text" id="f-pic" class="form-control mb-2" placeholder="PIC">
+    <input type="text" id="f-note" class="form-control mb-3" placeholder="Catatan">
+    <button id="btn-save" class="btn btn-primary w-100 fw-bold rounded-3">Simpan</button>
+</div></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    const firebaseConfig = { apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I", authDomain: "wedding-budget-ahyat.firebaseapp.com", databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wedding-budget-ahyat", storageBucket: "wedding-budget-ahyat.firebasestorage.app", messagingSenderId: "225604233645", appId: "1:225604233645:web:9526c2ca39e5b5165f5924" };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const DB_RUNDOWN = "rundown_acara";
-    let currentEditId = null;
-    let myModal;
+    const app = initializeApp({ apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I", authDomain: "wedding-budget-ahyat.firebaseapp.com", databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wedding-budget-ahyat", storageBucket: "wedding-budget-ahyat.firebasestorage.app", messagingSenderId: "225604233645", appId: "1:225604233645:web:9526c2ca39e5b5165f5924" });
+    const db = getDatabase(app); const DB = "rundown_acara";
+    let curId=null, modal;
 
-    window.onload = () => { myModal = new bootstrap.Modal(document.getElementById('modalForm')); };
-    window.bukaModalTambah = () => {
-        currentEditId = null;
-        document.getElementById('modalTitle').innerText = "Tambah Kegiatan";
-        document.getElementById('f-start').value = ""; document.getElementById('f-end').value = ""; document.getElementById('f-activity').value = ""; document.getElementById('f-pic').value = ""; document.getElementById('f-note').value = "";
-        myModal.show();
-    };
-    window.editData = (id) => {
-        currentEditId = id;
-        const data = window.allData[id];
-        document.getElementById('modalTitle').innerText = "Edit Kegiatan";
-        document.getElementById('f-start').value = data.start; document.getElementById('f-end').value = data.end; document.getElementById('f-activity').value = data.activity; document.getElementById('f-pic').value = data.pic; document.getElementById('f-note').value = data.note;
-        myModal.show();
-    };
-    document.getElementById('btn-save').onclick = () => {
-        const start = document.getElementById('f-start').value; const end = document.getElementById('f-end').value; const activity = document.getElementById('f-activity').value; const pic = document.getElementById('f-pic').value; const note = document.getElementById('f-note').value;
-        const newData = { start, end, activity, pic, note };
-        if(start && activity) { if(currentEditId) { update(ref(db, DB_RUNDOWN + '/' + currentEditId), newData).then(() => myModal.hide()); } else { push(ref(db, DB_RUNDOWN), newData).then(() => myModal.hide()); } }
-    };
-    onValue(ref(db, DB_RUNDOWN), (s) => {
-        const d = s.val();
-        window.allData = d || {};
-        let items = [];
-        for(let id in d) items.push({ id, ...d[id] });
-        items.sort((a, b) => a.start.localeCompare(b.start));
-        let h = '';
-        items.forEach(item => {
-            h += `<tr><td class="time-col">${item.start} - ${item.end}</td><td class="fw-bold">${item.activity}</td><td>${item.pic}</td><td class="text-muted small">${item.note}</td><td class="text-center"><button onclick="editData('${item.id}')" class="btn btn-sm btn-outline-warning border-0 me-1"><i class="bi bi-pencil-square"></i></button><button onclick="del('${item.id}')" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button></td></tr>`;
+    window.onload=()=>{modal=new bootstrap.Modal(document.getElementById('modalForm'));}
+    window.bukaModal=()=>{curId=null; document.getElementById('modalTitle').innerText="Tambah Kegiatan"; document.getElementById('f-start').value=''; document.getElementById('f-act').value=''; modal.show();}
+    window.edit=(id)=>{curId=id; const d=window.allData[id]; document.getElementById('modalTitle').innerText="Edit Kegiatan"; document.getElementById('f-start').value=d.start; document.getElementById('f-end').value=d.end; document.getElementById('f-act').value=d.activity; document.getElementById('f-pic').value=d.pic; document.getElementById('f-note').value=d.note; modal.show();}
+    document.getElementById('btn-save').onclick=()=>{
+        const data={start:document.getElementById('f-start').value, end:document.getElementById('f-end').value, activity:document.getElementById('f-act').value, pic:document.getElementById('f-pic').value, note:document.getElementById('f-note').value};
+        if(data.activity){ (curId ? update(ref(db,DB+'/'+curId),data) : push(ref(db,DB),data)).then(()=>{modal.hide();}); }
+    }
+    onValue(ref(db,DB),(s)=>{
+        const d=s.val(); window.allData=d||{}; let items=[];
+        for(let id in d) items.push({id,...d[id]}); items.sort((a,b)=>a.start.localeCompare(b.start));
+        let h=''; items.forEach(i=>{
+            h+=`<tr><td class="time-col">${i.start} - ${i.end}</td><td class="fw-bold">${i.activity}</td><td>${i.pic}</td><td>${i.note}</td><td class="text-center"><button onclick="edit('${i.id}')" class="btn btn-sm btn-outline-warning border-0"><i class="bi bi-pencil-square"></i></button><button onclick="if(confirm('Hapus?')) remove(ref(db,'${DB}/${i.id}'))" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button></td></tr>`;
         });
-        document.getElementById('data-list').innerHTML = h;
+        document.getElementById('data-list').innerHTML=h;
     });
-    window.del = (id) => { if(confirm('Hapus?')) remove(ref(db, DB_RUNDOWN + '/' + id)); };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

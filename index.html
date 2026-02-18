@@ -9,36 +9,51 @@
     <style>
         :root { --sidebar-width: 260px; --accent: #ff75a0; --bg: #fdf6f8; }
         body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; margin: 0; }
-        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; z-index: 1000; overflow-y: auto; }
-        .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; }
-        .nav-link { color: #666; padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; text-decoration: none; font-weight: 500; }
-        .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; box-shadow: 0 4px 12px rgba(255, 117, 160, 0.3); }
-        .stat-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); background: white; padding: 20px; height: 100%; transition: 0.3s; }
-        .stat-card:hover { transform: translateY(-3px); }
-        .spreadsheet-container { background: #1a1a1a; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: #eee; }
-        .table-dark-custom { width: 100%; border-collapse: collapse; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; }
-        .table-dark-custom thead tr { background-color: #333; border-bottom: 2px solid #555; }
-        .table-dark-custom th { padding: 12px 15px; text-align: left; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 1px; border-right: 1px solid #444; }
-        .table-dark-custom td { padding: 10px 15px; border-bottom: 1px solid #333; border-right: 1px solid #333; vertical-align: middle; }
-        .table-dark-custom tbody tr:hover { background-color: #252525; }
-        .group-header { background-color: #444; color: #fff; font-weight: bold; padding: 8px 15px; text-transform: uppercase; }
-        .badge-status { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; }
-        .status-lunas { background: #198754; color: white; }
-        .status-belum { background: #ffc107; color: #000; }
-        .col-money { text-align: right; font-family: 'Consolas', monospace; }
-        .text-him { color: #54a0ff; }
-        .text-her { color: #ff9ff3; }
-        @media print {
-            .sidebar, .btn, .nav-link, .modal { display: none !important; }
-            .main-content { margin-left: 0 !important; padding: 0 !important; width: 100% !important; }
-            body { background: white; }
+        
+        /* DESKTOP SIDEBAR */
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; z-index: 1001; transition: 0.3s; overflow-y: auto; }
+        .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; transition: 0.3s; }
+        
+        /* MOBILE STYLES */
+        .mobile-nav { display: none; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        
+        @media (max-width: 768px) {
+            .sidebar { left: -100%; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 80px; }
+            .mobile-nav { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 999; padding: 0 20px; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+            .overlay.active { display: block; }
+            h2 { font-size: 1.5rem; }
+            .stat-card h4 { font-size: 1.2rem; }
         }
+
+        .nav-link { color: #666; padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; text-decoration: none; font-weight: 500; }
+        .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; }
+        .stat-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); background: white; padding: 20px; height: 100%; }
+        
+        /* Spreadsheet Style */
+        .spreadsheet-container { background: #1a1a1a; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: #eee; }
+        .table-dark-custom { width: 100%; min-width: 600px; /* Biar bisa scroll di HP */ border-collapse: collapse; font-family: 'Consolas', monospace; font-size: 0.9rem; }
+        .table-dark-custom thead tr { background-color: #333; }
+        .table-dark-custom th, .table-dark-custom td { padding: 12px 15px; border-bottom: 1px solid #333; border-right: 1px solid #444; }
+        .group-header { background-color: #444; font-weight: bold; }
+        .col-money { text-align: right; }
+        .text-him { color: #54a0ff; } .text-her { color: #ff9ff3; }
+        
+        @media print { .sidebar, .mobile-nav, .btn { display: none !important; } .main-content { margin: 0 !important; } }
     </style>
 </head>
 <body>
 
+<div class="mobile-nav">
+    <h5 class="fw-bold m-0" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h5>
+    <button class="btn btn-light border-0" onclick="toggleSidebar()"><i class="bi bi-list fs-4"></i></button>
+</div>
+<div class="overlay" onclick="toggleSidebar()"></div>
+
 <div class="sidebar">
-    <div class="text-center mb-5"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
+    <div class="text-center mb-5 d-none d-md-block"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
     <nav class="nav flex-column">
         <a class="nav-link active" href="index.html"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
         <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
@@ -57,8 +72,8 @@
         <button onclick="window.print()" class="btn btn-dark btn-sm rounded-pill px-3"><i class="bi bi-printer-fill me-1"></i> Simpan PDF</button>
     </div>
     
-    <div class="alert alert-light border-0 shadow-sm d-flex align-items-center mb-4" role="alert" style="border-radius: 15px;">
-        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+    <div class="alert alert-light border-0 shadow-sm d-flex align-items-center mb-4" style="border-radius: 15px;">
+        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; min-width: 50px;">
             <i class="bi bi-calendar-heart-fill fs-4"></i>
         </div>
         <div>
@@ -68,10 +83,10 @@
     </div>
 
     <div class="row g-3 mb-5">
-        <div class="col-md-3"><div class="stat-card border-start border-4 border-primary"><small class="text-muted fw-bold">TOTAL PLAN</small><h4 id="grand-total" class="fw-bold mt-1">Rp 0</h4></div></div>
-        <div class="col-md-3"><div class="stat-card border-start border-4 border-info"><small class="text-info fw-bold"><i class="bi bi-gender-male"></i> TOTAL HIM</small><h4 id="total-cowo" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
-        <div class="col-md-3"><div class="stat-card border-start border-4 border-danger"><small class="text-danger fw-bold"><i class="bi bi-gender-female"></i> TOTAL HER</small><h4 id="total-cewe" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
-        <div class="col-md-3"><div class="stat-card border-start border-4 border-warning"><small class="text-warning fw-bold">GAP / SISA</small><h4 id="grand-debt" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card border-start border-4 border-primary"><small class="text-muted fw-bold">TOTAL PLAN</small><h4 id="grand-total" class="fw-bold mt-1">Rp 0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card border-start border-4 border-info"><small class="text-info fw-bold">HIM 🤵</small><h4 id="total-cowo" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card border-start border-4 border-danger"><small class="text-danger fw-bold">HER 👰</small><h4 id="total-cewe" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card border-start border-4 border-warning"><small class="text-warning fw-bold">SISA</small><h4 id="grand-debt" class="fw-bold mt-1 text-dark">Rp 0</h4></div></div>
     </div>
 
     <div class="spreadsheet-container">
@@ -79,20 +94,15 @@
             <table class="table-dark-custom">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width: 25%;">DETAIL</th>
-                        <th rowspan="2" style="width: 10%;">STATUS</th>
-                        <th rowspan="2" class="text-end" style="width: 15%;">PLAN (IDR)</th>
-                        <th colspan="2" class="text-center" style="border-bottom: 1px solid #555;">ACTUAL (IDR)</th>
-                        <th rowspan="2" class="text-end" style="width: 15%;">SISA</th>
+                        <th rowspan="2">DETAIL</th>
+                        <th rowspan="2">STATUS</th>
+                        <th rowspan="2" class="text-end">PLAN</th>
+                        <th colspan="2" class="text-center">ACTUAL</th>
+                        <th rowspan="2" class="text-end">SISA</th>
                     </tr>
-                    <tr>
-                        <th class="text-end text-him" style="width: 15%;">HIM 🤵</th>
-                        <th class="text-end text-her" style="width: 15%;">HER 👰</th>
-                    </tr>
+                    <tr><th class="text-end text-him">HIM</th><th class="text-end text-her">HER</th></tr>
                 </thead>
-                <tbody id="master-table">
-                    <tr><td colspan="6" class="text-center p-5 text-muted">Memuat data...</td></tr>
-                </tbody>
+                <tbody id="master-table"><tr><td colspan="6" class="text-center p-5">Memuat data...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -101,105 +111,51 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I",
-        authDomain: "wedding-budget-ahyat.firebaseapp.com",
-        databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "wedding-budget-ahyat",
-        storageBucket: "wedding-budget-ahyat.firebasestorage.app",
-        messagingSenderId: "225604233645",
-        appId: "1:225604233645:web:9526c2ca39e5b5165f5924"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I", authDomain: "wedding-budget-ahyat.firebaseapp.com", databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wedding-budget-ahyat", storageBucket: "wedding-budget-ahyat.firebasestorage.app", messagingSenderId: "225604233645", appId: "1:225604233645:web:9526c2ca39e5b5165f5924" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     
-    // GANTI TANGGAL NIKAH DI SINI
+    // JS Responsive Sidebar
+    window.toggleSidebar = () => {
+        document.querySelector('.sidebar').classList.toggle('active');
+        document.querySelector('.overlay').classList.toggle('active');
+    }
+
+    // Countdown
     const weddingDate = new Date("2027-12-31").getTime(); 
-    setInterval(function() {
+    setInterval(() => {
         const now = new Date().getTime();
-        const distance = weddingDate - now;
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const days = Math.floor((weddingDate - now) / (1000 * 60 * 60 * 24));
         document.getElementById("countdown-text").innerHTML = days + " Hari Lagi! 💍";
     }, 1000);
 
-    const categories = [
-        { key: 'venue_catering', label: 'VENUE & CATERING' },
-        { key: 'mua_attire', label: 'MUA & ATTIRE' },
-        { key: 'dokumentasi', label: 'DOKUMENTASI' },
-        { key: 'logistik_lainnya', label: 'LOGISTIK & LAINNYA' }
-    ];
-
-    function loadAllData() {
-        let stats = { total: 0, cowo: 0, cewe: 0 };
-        let allData = {};
-        let loadedCount = 0;
-
-        categories.forEach(cat => {
-            onValue(ref(db, cat.key), (snapshot) => {
-                const data = snapshot.val();
-                let items = [];
-                if (data) {
-                    for (let id in data) {
-                        const item = data[id];
-                        items.push(item);
-                        stats.total += (item.price || 0);
-                        stats.cowo += (item.paidCowo || 0);
-                        stats.cewe += (item.paidCewe || 0);
-                    }
-                }
-                allData[cat.label] = items;
-                loadedCount++;
-
-                if (loadedCount === categories.length) {
-                    renderTable(allData);
-                    renderStats(stats);
-                }
+    const categories = [{key:'venue_catering',label:'VENUE & CATERING'},{key:'mua_attire',label:'MUA & ATTIRE'},{key:'dokumentasi',label:'DOKUMENTASI'},{key:'logistik_lainnya',label:'LOGISTIK & LAINNYA'}];
+    function loadAllData(){
+        let stats={total:0,cowo:0,cewe:0}; let allData={}; let loaded=0;
+        categories.forEach(cat=>{
+            onValue(ref(db,cat.key),(s)=>{
+                const d=s.val(); let items=[];
+                if(d){for(let id in d){const i=d[id];items.push(i);stats.total+=(i.price||0);stats.cowo+=(i.paidCowo||0);stats.cewe+=(i.paidCewe||0);}}
+                allData[cat.label]=items; loaded++;
+                if(loaded===categories.length){renderTable(allData);renderStats(stats);}
             });
         });
     }
-
-    function renderStats(stats) {
-        document.getElementById('grand-total').innerText = formatRupiah(stats.total);
-        document.getElementById('total-cowo').innerText = formatRupiah(stats.cowo);
-        document.getElementById('total-cewe').innerText = formatRupiah(stats.cewe);
-        document.getElementById('grand-debt').innerText = formatRupiah(stats.total - stats.cowo - stats.cewe);
+    function renderStats(s){
+        document.getElementById('grand-total').innerText=fmt(s.total); document.getElementById('total-cowo').innerText=fmt(s.cowo);
+        document.getElementById('total-cewe').innerText=fmt(s.cewe); document.getElementById('grand-debt').innerText=fmt(s.total-s.cowo-s.cewe);
     }
-
-    function renderTable(groupedData) {
-        const tbody = document.getElementById('master-table');
-        let html = '';
-
-        categories.forEach(cat => {
-            const items = groupedData[cat.label] || [];
-            html += `<tr class="group-header"><td colspan="6">${cat.label}</td></tr>`;
-            if(items.length === 0) { html += `<tr><td colspan="6" class="text-center text-muted fst-italic py-3">Belum ada data</td></tr>`; }
-
-            items.forEach(item => {
-                const paidCowo = item.paidCowo || 0;
-                const paidCewe = item.paidCewe || 0;
-                const totalPaid = paidCowo + paidCewe;
-                const sisa = (item.price || 0) - totalPaid;
-                const statusBadge = sisa <= 0 ? '<span class="badge-status status-lunas">LUNAS</span>' : '<span class="badge-status status-belum">BELUM</span>';
-
-                html += `<tr>
-                    <td><div class="fw-bold text-white">${item.item}</div><small class="text-muted" style="font-size:0.75rem">${item.vendor || '-'}</small></td>
-                    <td>${statusBadge}</td>
-                    <td class="col-money">${formatRupiah(item.price || 0, false)}</td>
-                    <td class="col-money text-him">${paidCowo > 0 ? formatRupiah(paidCowo, false) : '-'}</td>
-                    <td class="col-money text-her">${paidCewe > 0 ? formatRupiah(paidCewe, false) : '-'}</td>
-                    <td class="col-money ${sisa > 0 ? 'text-warning' : 'text-success'}">${sisa > 0 ? formatRupiah(sisa, false) : '0'}</td>
-                </tr>`;
+    function renderTable(data){
+        let h=''; categories.forEach(cat=>{
+            const items=data[cat.label]||[]; h+=`<tr class="group-header"><td colspan="6">${cat.label}</td></tr>`;
+            items.forEach(i=>{
+                const c=i.paidCowo||0, w=i.paidCewe||0, sisa=(i.price||0)-(c+w);
+                const st = sisa<=0 ? '<span class="badge bg-success">LUNAS</span>' : '<span class="badge bg-warning text-dark">BELUM</span>';
+                h+=`<tr><td><div>${i.item}</div><small class="text-muted">${i.vendor||'-'}</small></td><td>${st}</td><td class="col-money">${fmt(i.price,0)}</td><td class="col-money text-him">${c>0?fmt(c,0):'-'}</td><td class="col-money text-her">${w>0?fmt(w,0):'-'}</td><td class="col-money ${sisa>0?'text-warning':'text-success'}">${sisa>0?fmt(sisa,0):'0'}</td></tr>`;
             });
-        });
-        tbody.innerHTML = html;
+        }); document.getElementById('master-table').innerHTML=h;
     }
-
-    function formatRupiah(angka, withSymbol = true) {
-        let str = new Intl.NumberFormat('id-ID').format(angka);
-        return withSymbol ? 'Rp ' + str : str;
-    }
+    function fmt(n,sym=1){return (sym?'Rp ':'')+new Intl.NumberFormat('id-ID').format(n);}
     loadAllData();
 </script>
 </body>

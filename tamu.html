@@ -9,20 +9,30 @@
     <style>
         :root { --sidebar-width: 260px; --accent: #ff75a0; --bg: #fdf6f8; }
         body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; margin: 0; }
-        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; }
-        .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; }
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid #eee; position: fixed; height: 100vh; padding: 25px; z-index: 1001; transition: 0.3s; }
+        .main-content { margin-left: var(--sidebar-width); padding: 40px; width: 100%; transition: 0.3s; }
+        .mobile-nav { display: none; } .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        @media (max-width: 768px) {
+            .sidebar { left: -100%; } .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 80px; }
+            .mobile-nav { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 999; padding: 0 20px; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+            .overlay.active { display: block; }
+        }
         .nav-link { color: #666; padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: var(--accent); color: white !important; }
-        .card-table { border: none; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); background: white; padding: 20px; }
-        .badge-vip { background-color: #ffd700; color: #000; }
-        .badge-fam { background-color: #ff9ff3; color: #fff; }
-        .badge-frn { background-color: #54a0ff; color: #fff; }
+        .card-table { border: none; border-radius: 20px; background: white; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
     </style>
 </head>
 <body>
 
+<div class="mobile-nav">
+    <h5 class="fw-bold m-0" style="color: var(--accent);">Wedding</h5>
+    <button class="btn btn-light" onclick="document.querySelector('.sidebar').classList.toggle('active');document.querySelector('.overlay').classList.toggle('active');"><i class="bi bi-list fs-4"></i></button>
+</div>
+<div class="overlay" onclick="document.querySelector('.sidebar').classList.remove('active');this.classList.remove('active');"></div>
+
 <div class="sidebar">
-    <div class="text-center mb-5"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
+    <div class="text-center mb-5 d-none d-md-block"><h3 class="fw-bold" style="color: var(--accent);"><i class="bi bi-heart-fill"></i> Wedding</h3></div>
     <nav class="nav flex-column">
         <a class="nav-link" href="index.html"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
         <a class="nav-link" href="venue.html"><i class="bi bi-house-heart me-2"></i> Venue & Catering</a>
@@ -37,90 +47,51 @@
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold">💌 Daftar Tamu</h2>
-            <p class="text-muted" id="total-pax-display">Total Pax: 0</p>
-        </div>
-        <button class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 12px;" onclick="bukaModalTambah()">+ Tambah Tamu</button>
+        <div><h2 class="fw-bold">💌 Daftar Tamu</h2><p class="text-muted mb-0" id="total-pax">Total Pax: 0</p></div>
+        <button class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 12px;" onclick="bukaModal()">+ Tamu</button>
     </div>
-
     <div class="card card-table">
         <div class="table-responsive">
-            <table class="table align-middle table-hover">
-                <thead class="bg-light"><tr><th>Nama Tamu</th><th>Kategori</th><th>Jatah Pax</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
+            <table class="table align-middle" style="min-width: 600px;">
+                <thead class="bg-light"><tr><th>Nama</th><th>Kategori</th><th>Pax</th><th>Status</th><th class="text-center">Aksi</th></tr></thead>
                 <tbody id="data-list"></tbody>
             </table>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalForm" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-3" style="border-radius:20px;">
-            <div class="modal-header border-0"><h5 class="fw-bold" id="modalTitle">Tambah Tamu</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <input type="text" id="f-name" class="form-control mb-2 p-3" placeholder="Nama Lengkap">
-                <select id="f-cat" class="form-select mb-2 p-3">
-                    <option value="Keluarga">Keluarga</option>
-                    <option value="VIP">VIP</option>
-                    <option value="Teman">Teman</option>
-                    <option value="Kantor">Rekan Kerja</option>
-                </select>
-                <input type="number" id="f-pax" class="form-control mb-2 p-3" placeholder="Jumlah Pax" value="2">
-                <select id="f-status" class="form-select p-3">
-                    <option value="Belum Dikirim">Belum Dikirim</option>
-                    <option value="Sudah Dikirim">Sudah Dikirim (Sent)</option>
-                </select>
-                <button id="btn-save" class="btn btn-primary w-100 fw-bold mt-2 p-3" style="border-radius:12px;">Simpan</button>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="modal fade" id="modalForm" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-3" style="border-radius:20px;">
+    <h5 class="fw-bold mb-3" id="modalTitle">Data Tamu</h5>
+    <input type="text" id="f-name" class="form-control mb-2" placeholder="Nama Lengkap">
+    <select id="f-cat" class="form-select mb-2"><option value="Keluarga">Keluarga</option><option value="VIP">VIP</option><option value="Teman">Teman</option><option value="Kantor">Kantor</option></select>
+    <input type="number" id="f-pax" class="form-control mb-2" placeholder="Jumlah Pax" value="2">
+    <select id="f-status" class="form-select mb-3"><option value="Belum">Belum Dikirim</option><option value="Sent">Sudah Dikirim</option></select>
+    <button id="btn-save" class="btn btn-primary w-100 fw-bold rounded-3">Simpan</button>
+</div></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    const firebaseConfig = { apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I", authDomain: "wedding-budget-ahyat.firebaseapp.com", databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wedding-budget-ahyat", storageBucket: "wedding-budget-ahyat.firebasestorage.app", messagingSenderId: "225604233645", appId: "1:225604233645:web:9526c2ca39e5b5165f5924" };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const DB_TAMU = "guest_list";
-    let currentEditId = null;
-    let myModal;
+    const app = initializeApp({ apiKey: "AIzaSyBKIOembXpQaLZqoYS1vTjKepVGmFSzR2I", authDomain: "wedding-budget-ahyat.firebaseapp.com", databaseURL: "https://wedding-budget-ahyat-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "wedding-budget-ahyat", storageBucket: "wedding-budget-ahyat.firebasestorage.app", messagingSenderId: "225604233645", appId: "1:225604233645:web:9526c2ca39e5b5165f5924" });
+    const db = getDatabase(app); const DB = "guest_list";
+    let curId=null, modal;
 
-    window.onload = () => { myModal = new bootstrap.Modal(document.getElementById('modalForm')); };
-    window.bukaModalTambah = () => {
-        currentEditId = null;
-        document.getElementById('modalTitle').innerText = "Tambah Tamu";
-        document.getElementById('f-name').value = ""; document.getElementById('f-pax').value = "2";
-        myModal.show();
-    };
-    window.editData = (id) => {
-        currentEditId = id;
-        const data = window.allData[id];
-        document.getElementById('modalTitle').innerText = "Edit Tamu";
-        document.getElementById('f-name').value = data.name; document.getElementById('f-cat').value = data.cat; document.getElementById('f-pax').value = data.pax; document.getElementById('f-status').value = data.status;
-        myModal.show();
-    };
-    document.getElementById('btn-save').onclick = () => {
-        const name = document.getElementById('f-name').value; const cat = document.getElementById('f-cat').value; const pax = parseInt(document.getElementById('f-pax').value) || 2; const status = document.getElementById('f-status').value;
-        const newData = { name, cat, pax, status };
-        if(name) { if(currentEditId) { update(ref(db, DB_TAMU + '/' + currentEditId), newData).then(() => myModal.hide()); } else { push(ref(db, DB_TAMU), newData).then(() => myModal.hide()); } }
-    };
-    onValue(ref(db, DB_TAMU), (s) => {
-        const d = s.val();
-        window.allData = d || {};
-        let h = '';
-        let totalPax = 0;
-        for(let id in d) {
-            totalPax += (d[id].pax || 0);
-            let badgeClass = d[id].cat === 'VIP' ? 'badge-vip' : (d[id].cat === 'Keluarga' ? 'badge-fam' : 'badge-frn');
-            let statusIcon = d[id].status === 'Sudah Dikirim' ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-hourglass text-muted"></i>';
-            h += `<tr><td class="fw-bold">${d[id].name}</td><td><span class="badge ${badgeClass} rounded-pill px-3">${d[id].cat}</span></td><td>${d[id].pax} orang</td><td>${statusIcon} ${d[id].status}</td><td class="text-center"><button onclick="editData('${id}')" class="btn btn-sm btn-outline-warning border-0 me-1"><i class="bi bi-pencil-square"></i></button><button onclick="del('${id}')" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button></td></tr>`;
+    window.onload=()=>{modal=new bootstrap.Modal(document.getElementById('modalForm'));}
+    window.bukaModal=()=>{curId=null; document.getElementById('modalTitle').innerText="Tambah Tamu"; document.getElementById('f-name').value=''; document.getElementById('f-pax').value='2'; modal.show();}
+    window.edit=(id)=>{curId=id; const d=window.allData[id]; document.getElementById('modalTitle').innerText="Edit Tamu"; document.getElementById('f-name').value=d.name; document.getElementById('f-cat').value=d.cat; document.getElementById('f-pax').value=d.pax; document.getElementById('f-status').value=d.status; modal.show();}
+    document.getElementById('btn-save').onclick=()=>{
+        const data={name:document.getElementById('f-name').value, cat:document.getElementById('f-cat').value, pax:+document.getElementById('f-pax').value, status:document.getElementById('f-status').value};
+        if(data.name){ (curId ? update(ref(db,DB+'/'+curId),data) : push(ref(db,DB),data)).then(()=>{modal.hide();}); }
+    }
+    onValue(ref(db,DB),(s)=>{
+        const d=s.val(); window.allData=d||{}; let h='', total=0;
+        for(let id in d){
+            total+=d[id].pax||0;
+            const st=d[id].status==='Sent'?'<span class="text-success"><i class="bi bi-check-all"></i> Sent</span>':'<span class="text-muted">Pending</span>';
+            h+=`<tr><td class="fw-bold">${d[id].name}</td><td>${d[id].cat}</td><td>${d[id].pax}</td><td>${st}</td><td class="text-center"><button onclick="edit('${id}')" class="btn btn-sm btn-outline-warning border-0"><i class="bi bi-pencil-square"></i></button><button onclick="if(confirm('Hapus?')) remove(ref(db,'${DB}/${id}'))" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash"></i></button></td></tr>`;
         }
-        document.getElementById('data-list').innerHTML = h;
-        document.getElementById('total-pax-display').innerHTML = `Total Estimasi Catering: <b>${totalPax} porsi</b>`;
+        document.getElementById('data-list').innerHTML=h; document.getElementById('total-pax').innerText=`Total Pax: ${total}`;
     });
-    window.del = (id) => { if(confirm('Hapus tamu?')) remove(ref(db, DB_TAMU + '/' + id)); };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
